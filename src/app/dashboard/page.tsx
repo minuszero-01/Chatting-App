@@ -1,17 +1,17 @@
-import { AppbarClient } from "@/components/ui/AppbarClient";
+import AddFriend from "@/components/AddFriend";
+import { AppbarClient } from "@/components/AppbarClient";
 import { Button } from "@/components/ui/button";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
-import { FC } from "react";
+import { FC, useState } from "react";
 
 interface pageProps {}
 
-const page: FC<pageProps> = ({}) => {
-  return (
-    <div>
-      page
-      <Button>Hello</Button>
-    </div>
-  );
+const page: FC<pageProps> = async ({}) => {
+  const session = await getServerSession(authOptions);
+  console.log(session);
+  return <div className="border h-[90vh] w-full border-black">Dashboard</div>;
 };
 
 export default page;

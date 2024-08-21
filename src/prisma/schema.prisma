@@ -14,8 +14,21 @@ datasource db {
 }
 
 model User {
-  id                String                 @id @default(auto()) @map("_id") @db.ObjectId
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
   email             String?             @unique
   name              String?
   password          String
+  friends           Friends[]
+
 }
+
+model Friends{
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  friend      User     @relation(fields: [receiver_id], references: [id])
+  sender_id    String    @db.ObjectId
+  receiver_id   String    @db.ObjectId
+  name       String?
+  email       String?
+  isAccepted  Boolean?
+}
+
