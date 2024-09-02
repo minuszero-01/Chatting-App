@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 
     const { userRes, friendId } = body;
 
-    console.log(body);
+    console.log("body", body);
 
     const requestIdData = await prisma.user.findFirst({
       where: {
@@ -77,14 +77,33 @@ export async function POST(req: Request) {
     });
 
     if (userRes === "accept") {
-      const requestId = requestIdData?.friends[0].id;
+      const requestIdFriend = requestIdData?.friends[0].id;
 
       await prisma.friends.update({
         where: {
-          id: requestId,
+          id: requestIdFriend,
         },
         data: {
           isAccepted: true,
+        },
+      });
+
+      await prisma.friends.create({
+        data: {
+          sender_id: session.user.id,
+          receiver_id: friendId,
+          isAccepted: true,
+          name: requestIdData?.name,
+          email: requestIdData?.email,
+        },
+      });
+
+      const sortedIds = [session.user.id, friendId].sort();
+      const chatId = `${sortedIds[0]}-${sortedIds[1]}`;
+
+      await prisma.chat.create({
+        data: {
+          chat_id: chatId,
         },
       });
     }

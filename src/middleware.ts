@@ -22,11 +22,11 @@ export default withAuth(
       return NextResponse.next();
     }
     if (!isAuth && isAccessingSensitiveRoute) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL("/api/auth/signin", req.url));
     }
 
     if (pathname == "/") {
-      return NextResponse.redirect(new URL("dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   },
   {

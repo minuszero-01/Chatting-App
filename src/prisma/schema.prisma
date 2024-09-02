@@ -32,3 +32,20 @@ model Friends{
   isAccepted  Boolean?
 }
 
+model Chat {
+  id  String @id @default(auto()) @map("_id") @db.ObjectId
+  chat_id String @unique
+  messages  Message[]
+}
+
+model Message {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  chat Chat @relation(fields: [message_chat_id], references: [chat_id])
+  message_chat_id String 
+  sender_id String
+  receiver_id String
+  text String
+  timestamp Int
+
+}
+

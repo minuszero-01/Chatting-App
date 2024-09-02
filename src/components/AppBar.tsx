@@ -1,4 +1,5 @@
 import { Button } from "./ui/button";
+import { LuMessageCircle } from "react-icons/lu";
 
 interface AppbarProps {
   user?: {
@@ -11,7 +12,8 @@ interface AppbarProps {
 export const Appbar = ({ user, onSignin, onSignout }: AppbarProps) => {
   return (
     <div className="h-max w-full flex justify-between p-4 border items-center">
-      <p className="text-3xl font-medium">
+      <p className=" flex items-center gap-2 text-3xl font-medium">
+        <LuMessageCircle />
         Chat App <span>.</span>
       </p>
       <Button onClick={user ? onSignout : onSignin}>

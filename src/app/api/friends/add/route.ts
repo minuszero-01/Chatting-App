@@ -16,8 +16,6 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("friend data", dbData);
-
     const idToAdd = dbData?.id;
     if (!idToAdd) {
       return new Response("This person doesn't exist", { status: 401 });

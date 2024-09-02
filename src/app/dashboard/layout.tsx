@@ -1,3 +1,4 @@
+import GetFriends from "@/components/GetFriends";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -28,6 +29,7 @@ const siderbarOptions: SideBarOption[] = [
 const Layout = async ({ children }: LayoutProps) => {
   const session = await getServerSession(authOptions);
   if (!session) notFound();
+
   return (
     <div className="w-full flex h-[90vh]">
       <div className="flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-auto border-r border-gray-200 bd-white px-6 ">
@@ -40,7 +42,9 @@ const Layout = async ({ children }: LayoutProps) => {
 
         <nav className="flex flex-1 flex-col">
           <ul role="list" className="flex flex-1 flex-col gap-y-7">
-            <li>Chats</li>
+            <li>
+              <GetFriends />
+            </li>
             <li>
               <div className="text-sm font-semibold leading-6 text-gray-400">
                 Overview
