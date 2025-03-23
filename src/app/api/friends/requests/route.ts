@@ -1,4 +1,6 @@
 import { authOptions } from "@/lib/auth";
+import { pusherServer } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import prisma from "@/prisma";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -117,6 +119,14 @@ export async function POST(req: Request) {
         },
       });
     }
+
+    pusherServer.trigger(
+      toPusherKey(`user:${session.user.id}:RequestRes`),
+      "RequestRes",
+      {
+        resStatus: userRes,
+      }
+    );
 
     return new Response("ok", {
       status: 200,

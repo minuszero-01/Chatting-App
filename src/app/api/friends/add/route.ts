@@ -3,6 +3,9 @@ import { addFriendValidator } from "@/lib/validations/add-friend";
 import prisma from "@/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { pusherServer } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
+import { setEngine } from "crypto";
 
 export async function POST(req: Request) {
   try {
@@ -50,6 +53,18 @@ export async function POST(req: Request) {
       }
     }
 
+    //Send the client a notification
+    pusherServer.trigger(
+      toPusherKey(`user:${dbData.id}:incoming_friend_requests`),
+      "incoming_friend_requests",
+      {
+        sender_id: session.user.id,
+        receiver_id: dbData.id,
+        name: session.user.name,
+        isAccepted: false,
+        email: session.user.email,
+      }
+    );
     await prisma.friends.create({
       data: {
         sender_id: session.user.id,

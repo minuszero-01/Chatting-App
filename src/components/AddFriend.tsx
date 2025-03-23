@@ -7,12 +7,11 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast, { Toaster } from "react-hot-toast";
 
 type FormData = z.infer<typeof addFriendValidator>;
 
 const AddFriend = () => {
-  const [showSuccessState, setShowSuccessState] = useState<boolean>(false);
-
   const {
     register,
     handleSubmit,
@@ -30,15 +29,17 @@ const AddFriend = () => {
         email: validatedEmail,
       });
 
-      setShowSuccessState(true);
+      toast.success("Friend Request Sent");
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError("email", { message: error.message });
+        toast.error(error.message);
         return;
       }
 
       if (error instanceof AxiosError) {
         setError("email", { message: error.response?.data });
+        toast.error(error.response?.data);
         return;
       }
     }
@@ -66,11 +67,8 @@ const AddFriend = () => {
             Add
           </Button>
         </div>
-        <p className="mt-1 text-sm text-red-600">{errors.email?.message}</p>
-        {showSuccessState ? (
-          <p className="mt-1 text-sm text-green-600">Friend Request Sent !</p>
-        ) : null}
       </form>
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };

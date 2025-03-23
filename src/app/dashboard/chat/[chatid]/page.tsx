@@ -45,11 +45,7 @@ async function getChatMessages(chatid: string) {
     const dbMessages = res?.messages;
     const dbMessages_reverse = dbMessages?.reverse();
 
-    console.log(dbMessages_reverse);
-
     const messages = messageArrayValidator.parse(dbMessages_reverse);
-
-    console.log("Reverse", messages);
     return messages;
   } catch (error) {
     console.log("No Messages", error);
@@ -75,15 +71,10 @@ const page = async ({ params }: pageProps) => {
 
   const chatPatner = await getChatPatnerDetails(chatPatnerId);
 
-  console.log(chatPatner);
-
   const intialMessages = await getChatMessages(chatid);
-
-  console.log(params);
 
   return (
     <div className="p-4 w-full h-full">
-      {chatid}
       <div className="flex flex-col w-full h-full">
         <div className="flex rounded-xl items-center gap-4 border p-2 bg-gray-100 text-[20px] font-medium">
           <div className="rounded-full bg-white p-2 ring-1 ring-black">
@@ -100,6 +91,7 @@ const page = async ({ params }: pageProps) => {
           <Messages
             intialMessages={intialMessages}
             sessionId={session.user.id}
+            chatId={chatid}
           />
         </div>
 

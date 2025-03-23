@@ -1,6 +1,9 @@
 "use client";
+import { pusherClient } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import axios, { AxiosError } from "axios";
 import { FC, useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface FriendRequest {
   id: string;
@@ -11,7 +14,11 @@ interface FriendRequest {
   isAccepted: boolean;
 }
 
-const WaitingList = () => {
+type WaitingListProps = {
+  sessionId: string;
+};
+
+const WaitingList = ({ sessionId }: WaitingListProps) => {
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   useEffect(() => {
     const incomingRequests = async () => {
@@ -29,6 +36,38 @@ const WaitingList = () => {
     incomingRequests();
   }, []);
 
+  useEffect(() => {
+    //Subscribe
+    pusherClient.subscribe(
+      toPusherKey(`user:${sessionId}:incoming_friend_requests`)
+    );
+
+    const friendRequestHandler = (props: FriendRequest) => {
+      setRequests((prev) => [
+        ...prev,
+        {
+          id: props.id,
+          sender_id: props.sender_id,
+          receiver_id: props.receiver_id,
+          name: props.name,
+          email: props.email,
+          isAccepted: props.isAccepted,
+        },
+      ]);
+
+      toast.success(`Friend Request from ${props.name}`);
+    };
+
+    pusherClient.bind("incoming_friend_requests", friendRequestHandler);
+
+    return () => {
+      pusherClient.unsubscribe(
+        toPusherKey(`user:${sessionId}:incoming_friend_requests`)
+      );
+      pusherClient.unbind("incoming_friend_requests", friendRequestHandler);
+    };
+  }, []);
+
   const handleRequest = async (event: any) => {
     console.log(event);
     const friendId = event.target.value;
@@ -42,10 +81,8 @@ const WaitingList = () => {
   return (
     <div className="h-1/2 ">
       <div className="flex flex-col w-max p-4 ">
-        <div className="text-2xl font-medium leading-10 mb-2">Waiting List</div>
-        <div className="text-md block font-light leading-6 text-gray-900 divide-x-2 mb-2">
-          Friend requests
-        </div>
+        <div className="text-2xl font-medium leading-10 mb-2">Requests</div>
+
         {requests?.length != 0 ? (
           requests?.map((user) => (
             <div key={user.id} className="flex flex-col items-start gap-2">

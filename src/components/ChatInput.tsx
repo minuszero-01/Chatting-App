@@ -38,6 +38,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatId }) => {
         placeholder="Write a message..."
         autoComplete="off"
         ref={textareaRef}
+        value={input}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();

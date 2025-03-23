@@ -1,4 +1,6 @@
 import { authOptions } from "@/lib/auth";
+import { pusherServer } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import prisma from "@/prisma";
 import { getServerSession } from "next-auth";
 
@@ -56,6 +58,14 @@ export async function POST(req: Request) {
     //Validations Done
 
     const time = Date.now();
+
+    pusherServer.trigger(toPusherKey(`chat:${chatId}`), "incoming-message", {
+      message_chat_id: chatId,
+      sender_id: session.user.id,
+      receiver_id: friendId,
+      text: text,
+      timestamp: time,
+    });
 
     await prisma.message.create({
       data: {
