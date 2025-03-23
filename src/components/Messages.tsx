@@ -1,15 +1,16 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Message } from "@/lib/validations/messages";
-import { FC, useRef, useState } from "react";
+import { FC, useRef, useState, useEffect } from "react";
 import { format } from "date-fns";
 
 interface MessagesProps {
   intialMessages: Message[] | undefined;
   sessionId: string;
+  chatId: string;
 }
 
-const Messages: FC<MessagesProps> = ({ intialMessages, sessionId }) => {
+const Messages: FC<MessagesProps> = ({ intialMessages, sessionId, chatId }) => {
   const [messages, setMessages] = useState<Message[] | undefined>(
     intialMessages
   );
@@ -19,6 +20,7 @@ const Messages: FC<MessagesProps> = ({ intialMessages, sessionId }) => {
   };
 
   const scrollDownRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <div
       id="messages"

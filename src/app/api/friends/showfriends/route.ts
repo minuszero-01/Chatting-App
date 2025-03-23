@@ -36,5 +36,6 @@ export async function GET(req: Request) {
     if (error instanceof z.ZodError) {
       return new Response("Invalid request payload", { status: 422 });
     }
+    return new Response("Internal Server Error", { status: 500 });
   }
 }

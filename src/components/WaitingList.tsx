@@ -48,11 +48,8 @@ const WaitingList = () => {
         </div>
         {requests?.length != 0 ? (
           requests?.map((user) => (
-            <div className="flex flex-col items-start gap-2">
-              <div
-                key={user.id}
-                className="flex flex-row gap-2 justify-center items-center"
-              >
+            <div key={user.id} className="flex flex-col items-start gap-2">
+              <div className="flex flex-row gap-2 justify-center items-center">
                 <div>
                   {user.name}
                   <span className="mx-2">|</span>
