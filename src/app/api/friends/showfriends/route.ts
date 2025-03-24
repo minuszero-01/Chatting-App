@@ -28,7 +28,6 @@ export async function GET(req: Request) {
       return new Response("Nothing to show here...", { status: 401 });
     }
 
-    console.log(receivedFriends);
     return new Response(JSON.stringify(receivedFriends.friends), {
       status: 200,
     });

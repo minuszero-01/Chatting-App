@@ -14,6 +14,11 @@ interface FriendRequest {
   isAccepted: boolean;
 }
 
+type RequestResponse = {
+  id: string;
+  status: string;
+};
+
 type WaitingListProps = {
   sessionId: string;
 };
@@ -37,10 +42,31 @@ const WaitingList = ({ sessionId }: WaitingListProps) => {
   }, []);
 
   useEffect(() => {
-    //Subscribe
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:Requests`));
+
     pusherClient.subscribe(
       toPusherKey(`user:${sessionId}:incoming_friend_requests`)
     );
+
+    const ResponseHandler = (props: RequestResponse) => {
+      setRequests((prev) => {
+        console.log("Before filtering:", prev);
+        console.log("Removing ID:", props.id);
+
+        const filteredRequests = prev.filter(
+          (item) => item.sender_id !== props.id
+        );
+
+        console.log("After filtering:", filteredRequests);
+
+        return filteredRequests;
+      });
+      if (props.status == "accept") {
+        toast.success(`Friend Request Accepted`);
+      } else {
+        toast.success(`Friend Request Removed`);
+      }
+    };
 
     const friendRequestHandler = (props: FriendRequest) => {
       setRequests((prev) => [
@@ -59,17 +85,20 @@ const WaitingList = ({ sessionId }: WaitingListProps) => {
     };
 
     pusherClient.bind("incoming_friend_requests", friendRequestHandler);
+    pusherClient.bind("RequestResponse", ResponseHandler);
 
     return () => {
       pusherClient.unsubscribe(
         toPusherKey(`user:${sessionId}:incoming_friend_requests`)
       );
       pusherClient.unbind("incoming_friend_requests", friendRequestHandler);
+
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:Requests`));
+      pusherClient.unbind("RequestResponse", ResponseHandler);
     };
   }, []);
 
   const handleRequest = async (event: any) => {
-    console.log(event);
     const friendId = event.target.value;
     const userRes = event.target.innerText;
     await axios.post("/api/friends/requests", {
@@ -85,7 +114,7 @@ const WaitingList = ({ sessionId }: WaitingListProps) => {
 
         {requests?.length != 0 ? (
           requests?.map((user) => (
-            <div key={user.id} className="flex flex-col items-start gap-2">
+            <div className="flex flex-col items-start gap-2">
               <div className="flex flex-row gap-2 justify-center items-center">
                 <div>
                   {user.name}

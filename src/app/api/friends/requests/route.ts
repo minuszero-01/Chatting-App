@@ -12,7 +12,6 @@ export async function GET(req: Request) {
     if (!session) {
       return new Response("Unauthorized", { status: 401 });
     }
-    console.log(session.user?.id);
     const userData = await prisma.user.findFirst({
       where: {
         id: session.user?.id,
@@ -31,15 +30,12 @@ export async function GET(req: Request) {
     }
 
     const friendRequests = userData.friends.map((friend) => ({
-      id: friend.id,
       sender_id: friend.sender_id,
       receiver_id: friend.receiver_id,
       name: friend.name,
       email: friend.email,
       isAccepted: friend.isAccepted,
     }));
-
-    console.log(friendRequests);
 
     return new Response(JSON.stringify(friendRequests), {
       status: 200,
@@ -62,8 +58,6 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const { userRes, friendId } = body;
-
-    console.log("body", body);
 
     const requestIdData = await prisma.user.findFirst({
       where: {
@@ -121,12 +115,14 @@ export async function POST(req: Request) {
     }
 
     pusherServer.trigger(
-      toPusherKey(`user:${session.user.id}:RequestRes`),
-      "RequestRes",
+      toPusherKey(`user:${session.user.id}:Requests`),
+      "RequestResponse",
       {
-        resStatus: userRes,
+        id: friendId,
+        status: userRes,
       }
     );
+    pusherServer.trigger(toPusherKey(`FriendList`), "update", {});
 
     return new Response("ok", {
       status: 200,

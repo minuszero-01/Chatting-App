@@ -10,7 +10,7 @@ interface pageProps {}
 
 const page: FC<pageProps> = async ({}) => {
   const session = await getServerSession(authOptions);
-  console.log(session);
+
   return <div className="border h-[90vh] w-full border-black">Dashboard</div>;
 };
 

@@ -1,6 +1,9 @@
 "use client";
+import { pusherClient } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import axios, { AxiosError } from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
 
 type Friend = {
@@ -13,6 +16,7 @@ type Friend = {
 };
 
 const GetFriends = () => {
+  const router = useRouter();
   const [requests, setRequests] = useState<Friend[]>([]);
   useEffect(() => {
     const incomingRequests = async () => {
@@ -28,6 +32,20 @@ const GetFriends = () => {
     };
 
     incomingRequests();
+  }, []);
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`FriendList`));
+
+    const EventHandler = () => {
+      location.reload();
+    };
+    pusherClient.bind("update", EventHandler);
+
+    return () => {
+      pusherClient.unbind("update", EventHandler);
+      pusherClient.unsubscribe(toPusherKey(`FriendList`));
+    };
   }, []);
 
   return (
